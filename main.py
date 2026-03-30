@@ -19,6 +19,9 @@ app.add_middleware(
 DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
+# Path to the cookies.txt file (must be in the project root)
+COOKIE_FILE = "cookies.txt"
+
 def sanitize_filename(filename: str) -> str:
     return "".join(c for c in filename if c.isalnum() or c in (" ", "-", "_")).rstrip()
 
@@ -47,6 +50,7 @@ def get_video_info(url: str = Query(..., description="YouTube video URL")):
                 "Sec-Fetch-Mode": "navigate",
             },
             "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+            "cookiefile": COOKIE_FILE,  # <-- Added cookie support
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -90,6 +94,7 @@ def download_video(
                 "Sec-Fetch-Mode": "navigate",
             },
             "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+            "cookiefile": COOKIE_FILE,  # <-- Added cookie support
         }
 
         if type.lower() == "audio":
